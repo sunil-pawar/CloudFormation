@@ -99,6 +99,10 @@ Resources:
         ToPort: 80
         CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: 0.0.0.0/0
@@ -106,6 +110,10 @@ Resources:
       - IpProtocol: tcp
         FromPort: 80
         ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
         CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
         FromPort: 22
@@ -133,5 +141,19 @@ Resources:
                     echo "<html>I love YAML CloudFormation!!</html>" > /var/www/html/index.html;
                     cd /var/www/html;
                     chmod 755 index.html;
+                    mkdir -p /var/www/now;
+                    cat << EOF >> /var/www/now/index.html 
+<html>
+<body>
+<h2>JavaScript new Date()</h2>
+<p id="demo"></p>
+<script>
+var d = new Date();
+localtime = d.toLocaleTimeString('en-US', { hour12: false });
+document.getElementById("demo").innerHTML = localtime;
+</script>
+</body>
+</html>
+EOF
                     service httpd start;
                     chkconfig httpd on;
