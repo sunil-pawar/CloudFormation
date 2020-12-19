@@ -1,0 +1,141 @@
+Parameters:
+  Environment:
+   Description: Environment name that is prefixed with the resources
+   Type: String
+   Default: TEST
+  AvailabiltyZone:
+   Description: Availability zone to use
+   Type: String
+   Default: us-west-2  
+  VpcCIDR:
+   Description: The Cidr block for vpc
+   Type: String
+   Default: 10.0.0.0/16
+  PubSubCIDR:
+   Description: CIDR block for the public subnet
+   Type: String
+   Default: 10.0.1.0/24
+  AccessKey:
+   Description: Access key pair name
+   Type: String
+   Default: launch-key
+  MyImage:
+   Description: the image id of the instance
+   Type: String
+   Default: ami-01aae54e7b4213066
+   MyInstanceType:
+   Description: the Instance type of the instance
+   Type: String
+   Default: t2.micro
+   
+
+Resources:
+  VPC:
+    Type: 'AWS::EC2::VPC'
+    Properties: {
+        CidrBlock: !Ref VpcCIDR
+        EnableDnsSupport: true
+        EnableDnsHostnames: true
+        tags:
+         - Key: Name
+           Value: !Sub 
+              - $VPC_VPC
+              - { VPC: !Ref Environment  }
+        }
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties: 
+      Tags: 
+        - Key : Name 
+          Value: !Sub
+            - $IG_IG
+            - { IG : !Ref Environment }
+  AttachInternetGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties: 
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
+  PublicSubnet01:
+    Type: AWS::EC2::Subnet
+    Properties: 
+      AssignIpv6AddressOnCreation: false
+      AvailabilityZone: !Ref AvailabilityZone
+      CidrBlock: !Ref PubSubCIDR
+      MapPublicIpOnLaunch: true
+      Tags: 
+        - Key : Name
+          Value: !Sub
+          - $sub_subnet
+          - {sub : !Ref Environment }
+      VpcId: !Ref VPC
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties: 
+      Tags: 
+        - Key: Name
+          Value: !Sub
+           - $RoutTB_RoutTable
+           - { RoutTB : !Ref Environment }
+      VpcId: !Ref VPC
+  InetrnetRoute:
+    Type: AWS::EC2::Route
+    DependsOn : !Ref InternetGateway
+    Properties: 
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+      RouteTableId: !Ref RouteTable
+  SubnetRoutableAssociate:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref PublicSubnet01
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${Environment} Security Group
+      GroupDescription: "Security group with ingress rule"
+      VpcId: !Ref VPC 
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0 
+  MyWebServiceInstance:
+    Type: AWS::EC2::Instance
+    Properties: 
+      
+      ImageId: !Ref MyImage
+      InstanceType: MyInstanceType
+      KeyName: !Ref AccessKey
+      SecurityGroupIds: 
+        - !Ref MySecurityGroup
+      SubnetId: !Ref PublicSubnet01
+      Tags: 
+        - Key : Name
+          Value: !Sub
+             - $Instance_Instance
+             - { Instance : !Ref Environment}
+          
+      UserData:
+        Fn::Base64:
+            !Sub |
+                    #!/bin/bash -ex
+                    yum install -y httpd;
+                    echo "<html>I love YAML CloudFormation!!</html>" > /var/www/html/index.html;
+                    cd /var/www/html;
+                    chmod 755 index.html;
+                    service httpd start;
+                    chkconfig httpd on;
