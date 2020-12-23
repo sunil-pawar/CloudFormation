@@ -1,0 +1,10 @@
+---
+plugin: aws_ec2
+aws_access_key: AKIAI57C6S7CZ3BRXGSA 
+aws_secret_key: 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
+regions:
+  - us-west-2
+filters: 
+  tag:Name:
+       - TEST*
+  instance-state-name: running
