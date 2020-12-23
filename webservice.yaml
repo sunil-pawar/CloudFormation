@@ -138,20 +138,12 @@ Resources:
             !Sub |
                     #!/bin/bash -ex
                     yum install -y httpd;
-                    echo "<html>I love YAML CloudFormation!!</html>" > /var/www/html/index.html;
+                    echo "<html>Hello Welcome Please append /now to the URL to see the server time</html>" > /var/www/html/index.html;
                     cd /var/www/html;
                     chmod 755 index.html;
                     mkdir -p /var/www/now;
-                    echo  "<html>
-                    <body>
-                    <h2>JavaScript new Date()</h2>
-                    <p id="demo"></p>
-                    <script>
-                    var d = new Date();
-                    var localtime = d.toLocaleTimeString('en-US', { hour12: false });
-                    document.getElementById("demo").innerHTML = localtime;
-                    </script>
-                    </body>
-                    </html>" >> /var/www/now/index.html;
+                    sed -i  "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config;
+                    sed -i  "s/#PermitRootLogin/PermitRootLogin/" /etc/ssh/sshd_config;
+                    service sshd restart;
                     service httpd start;
                     chkconfig httpd on;
