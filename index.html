@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+                    <body>
+                    <h2>The time at server is </h2>
+                    <p id="demo"></p>
+                    <script>
+                    var d = new Date();
+                    var localtime = d.toLocaleTimeString('en-US', { hour12: false });
+                    document.getElementById("demo").innerHTML = localtime;
+                    </script>
+                    </body>
+                    </html>
