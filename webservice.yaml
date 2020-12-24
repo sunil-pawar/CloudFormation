@@ -18,7 +18,7 @@ Parameters:
   AccessKey:
    Description: Access key pair name
    Type: String
-   Default: launch-key
+   Default: ansible-node
   MyImage:
    Description: the image id of the instance
    Type: String
@@ -141,9 +141,9 @@ Resources:
                     echo "<html>Hello Welcome Please append /now to the URL to see the server time</html>" > /var/www/html/index.html;
                     cd /var/www/html;
                     chmod 755 index.html;
-                    mkdir -p /var/www/now;
-                    sed -i  "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config;
-                    sed -i  "s/#PermitRootLogin/PermitRootLogin/" /etc/ssh/sshd_config;
-                    service sshd restart;
+                    mkdir -p /var/www/html/now;
+                    #sed -i  "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config;
+                    #sed -i  "s/#PermitRootLogin/PermitRootLogin/" /etc/ssh/sshd_config;
+                    #service sshd restart;
                     service httpd start;
                     chkconfig httpd on;

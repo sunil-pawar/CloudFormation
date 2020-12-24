@@ -4,6 +4,11 @@
   become_user: root
   tasks:
 #Apache Configuration
+    - name: Set authorized key taken from file
+      ansible.posix.authorized_key:
+        user: root
+        state: present
+        key: "{{ lookup('file', '/root/.ssh/id_rsa.pub') }}"
     - name: copy index.php to now directory remote server
       copy: 
         src: /root/playbooks/index.html
