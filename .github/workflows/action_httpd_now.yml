@@ -23,5 +23,5 @@ jobs:
 
       # Runs  ansible playbook
       - name: run the ansible command 
-        run: ansible-playbook /root/playbooks/deploy_now.yml
+        run: ansible-playbook /root/playbook/deploy_now.yml -i /root/playbook/test_aws_ec2.yaml
 
