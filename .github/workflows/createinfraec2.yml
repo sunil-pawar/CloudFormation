@@ -22,5 +22,6 @@ jobs:
       
       # Runs a set of commands using the runners shell
       - name: run the playbook located at the ansible server 
-        run: ansible-playbook /root/playbook/deploy_cloudform.yml 
+        # run: ansible-playbook /root/playbook/deploy_cloudform.yml 
+        run: ansible-playbook deploy_cloudform.yml 
           
